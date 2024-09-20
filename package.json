@@ -1,0 +1,29 @@
+{
+  "name": "battleship",
+  "version": "1.0.0",
+  "description": "a battleship project",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SeanCagin/battleship.git"
+  },
+  "keywords": [
+    "battleship",
+    "board-game",
+    "game",
+    "multiplayer",
+    "singleplayer"
+  ],
+  "author": "sean",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SeanCagin/battleship/issues"
+  },
+  "homepage": "https://github.com/SeanCagin/battleship#readme",
+  "dependencies": {
+    "jest": "^29.7.0"
+  }
+}
