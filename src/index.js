@@ -8,13 +8,28 @@ const setupGrid = document.querySelector("#grid"); //bit misleading naming
 const buttonList = document.querySelector("#button-list");
 const pregameStates = [5, 5, 4, 3, 3, 2, 1, 1]; // ships that will be placed
 const turnIndicator = document.querySelector("#turn-indicator");
+const titleScreen = document.querySelector("#title-screen");
+const singleplayer = document.querySelector("#singleplayer");
+const multiplayer = document.querySelector("#multiplayer");
 let turn = -1; // universal turn tracker to disable/enable attack events
-let mode = 0; // 0: singleplayer mode, 1: multiplayer mode
+let mode = -1; // 0: singleplayer mode, 1: multiplayer mode
 
 document.addEventListener("keydown", (e) => {
   if (e.code === "Escape" && setupDialogue.open) {
     e.preventDefault();
   }
+});
+
+singleplayer.addEventListener("click", (e) => {
+  multiplayer.classList = "";
+  singleplayer.classList.add("selected");
+  mode = 0;
+});
+
+multiplayer.addEventListener("click", (e) => {
+  singleplayer.classList = "";
+  multiplayer.classList.add("selected");
+  mode = 1;
 });
 
 function homeRenderBoard(board, gameBoard) {
@@ -348,15 +363,21 @@ function displayWinner(player) {
   }
 }
 
+titleScreen.showModal();
+start.addEventListener("click", () => {
+  if (mode != -1) {
+    titleScreen.close();
+    displaySetup(player1).then(() => {
+      turn = 0;
+      homeRenderBoard(board1, player1);
+      enemyRenderBoard(board2, player2);
+    });
+  }
+});
+
 let player1 = new Gameboard();
 let player2 = new Gameboard(); // currently computer
 
 randomize(player2);
-
-displaySetup(player1).then(() => {
-  turn = 0;
-  homeRenderBoard(board1, player1);
-  enemyRenderBoard(board2, player2);
-});
 
 //inGameRenderBoard(board1, player1);
