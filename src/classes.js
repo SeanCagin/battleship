@@ -39,10 +39,7 @@ class Gameboard {
     }
   }
 
-  placeShip(start, stop) {
-    if (this.shipExistsInRange(start, stop)) {
-      return false;
-    }
+  isPlaceable(start, stop) {
     if (
       start[0] < 0 ||
       start[0] >= this.#size ||
@@ -55,6 +52,9 @@ class Gameboard {
     ) {
       return false;
     }
+    if (this.shipExistsInRange(start, stop)) {
+      return false;
+    }
     let length = 0;
     if (start[0] == stop[0]) {
       length = Math.abs(stop[1] - start[1]) + 1;
@@ -62,6 +62,11 @@ class Gameboard {
       length = Math.abs(Math.abs(stop[0] - start[0])) + 1;
     }
     if (length == 0) return false;
+    return length;
+  }
+  placeShip(start, stop) {
+    let length = this.isPlaceable(start, stop);
+    if (length === false) return false;
     // length is 0 if none of the above 2 are entered so this acocunts for
     // non-line placement attempts
     this.#placeShipH(start, stop, length);

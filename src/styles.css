@@ -29,10 +29,20 @@ div#page-holder {
   justify-content: center;
 }
 
-div.cell:hover {
+/* div.cell:hover {
   background-color: gray;
-}
+} */
 
 div.cell.black-cell {
   background-color: black;
+}
+
+div.hovered {
+  background-color: aquamarine;
+  opacity: 0.5;
+}
+
+div.illegal-hovered {
+  background-color: red;
+  opacity: 0.5;
 }
