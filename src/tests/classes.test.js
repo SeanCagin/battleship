@@ -20,7 +20,7 @@ describe("gameboard functionality", () => {
     expect(gb.onlyShipExistsInRange([0, 0], [0, 3])).toBe(true);
     expect(gb.shipExists([0, 4])).toBe(false);
     expect(gb.placeShip([0, 0], [0, 1])).toBe(false);
-    expect(gb.placeShip([1, 1], [1, 7])).toBe(false);
+    expect(gb.placeShip([1, 1], [1, 7])).toBe(true);
     expect(gb.placeShip([2, 2], [3, 3])).toBe(false);
   });
   test("receive attack ship", () => {

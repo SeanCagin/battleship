@@ -4,17 +4,21 @@ class Ship {
   constructor(length) {
     this.#length = length;
   }
+
   hit() {
     if (this.#hitCount >= this.#length) throw "ship has reached max hits";
     this.#hitCount++;
   }
+
   isSunk() {
     if (this.#hitCount >= this.#length) return true;
     return false;
   }
+
   getLength() {
     return this.#length;
   }
+
   getHitCount() {
     return this.#hitCount;
   }
@@ -57,13 +61,13 @@ class Gameboard {
     } else if (start[1] == stop[1]) {
       length = Math.abs(Math.abs(stop[0] - start[0])) + 1;
     }
+    if (length == 0) return false;
     // length is 0 if none of the above 2 are entered so this acocunts for
     // non-line placement attempts
-    if (length < 1 || length > 4) return false;
     this.#placeShipH(start, stop, length);
     return true;
   }
-
+  false;
   #placeShipH(start, stop, length) {
     let ship = new Ship(length);
     for (

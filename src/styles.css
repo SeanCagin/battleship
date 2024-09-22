@@ -28,3 +28,11 @@ div#page-holder {
   align-items: center;
   justify-content: center;
 }
+
+div.cell:hover {
+  background-color: gray;
+}
+
+div.cell.black-cell {
+  background-color: black;
+}
