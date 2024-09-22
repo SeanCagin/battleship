@@ -113,7 +113,7 @@ div.setup-title-wrapper {
 dialog#setup {
   background-color: color-mix(in srgb, var(--primary-color) 40%, white 60%);
   border: none;
-  margin-top: 65px;
+  margin-top: 20px;
 }
 
 #setup .title {
@@ -225,6 +225,7 @@ dialog::backdrop {
 #setup-wrapper {
   display: flex;
   flex-direction: column;
+  margin-top: 20px;
 }
 
 .reset {
