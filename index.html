@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battleship!</title>
+</head>
+<body>
+  <dialog id="title-screen">
+    <button id="focusonme">hello</button>
+    <div class="title-wrapper" >
+      <div id="game-title" >Please Select Your Mode!</div>
+
+      <div class="title-button-row">
+        <div id="singleplayer" class="mode">Singleplayer</div>
+        <div id="multiplayer" class="mode">Multiplayer</div>
+      </div>
+      <button id="start">Begin!</button>
+      <div class="footer dial">
+        <a href="https://github.com/SeanCagin/todo-list"><img src="550985caaa8859d4b95f.svg"></a>
+        <a href="https://github.com/SeanCagin/todo-list">SeanCagin GitHub 2024</a>
+      </div>
+      <button class="reset" id="reset-d1">Reset</button>
+      <button class="switch" id="switch-d1">Switch Colors</button>
+
+    </div>
+
+  </dialog>
+  <div id="setup-wrapper">
+    <dialog id="setup">
+      <div class="setup-title-wrapper">
+        <div class="title"></div>
+        <div id="button-list"></div>
+      </div>
+      <div id="grid"></div>
+      <div class="footer dial">
+        <a href="https://github.com/SeanCagin/todo-list"><img src="550985caaa8859d4b95f.svg"></a>
+        <a href="https://github.com/SeanCagin/todo-list">SeanCagin GitHub 2024</a>
+      </div>
+      <button class="reset" id="reset-d2">Reset</button>
+      <button class="switch" id="switch-d2">Switch Colors</button>
+    </dialog>
+  </div>
+  <div id="page-holder">
+    <div id="turn-indicator"></div>
+    <div id="game-holder">
+      <div class="board" id="board1"></div>
+      <div class="board" id="board2"></div>
+    </div>
+  </div>
+  <div class="footer">
+    <a href="https://github.com/SeanCagin/todo-list"><img src="550985caaa8859d4b95f.svg"></a>
+    <a href="https://github.com/SeanCagin/todo-list">SeanCagin GitHub 2024</a>
+  </div>
+  <button class="reset" id="reset-r">Reset</button>
+  <button class="switch" id="switch-r">Switch Colors</button>
+<script defer src="main.js"></script></body>
+</html>
