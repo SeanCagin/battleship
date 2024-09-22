@@ -6,28 +6,39 @@ const board2 = document.querySelector("#board2");
 const setupDialogue = document.querySelector("#setup");
 const setupGrid = document.querySelector("#grid"); //bit misleading naming
 const buttonList = document.querySelector("#button-list");
-const pregameStates = [5, 5, 4, 3, 3, 2, 1, 1]; // ships that will be placed
+const pregameStates = [5, 5, 4, 4, 3, 3, 2, 2]; // lengths of the ships that will be placed
 const turnIndicator = document.querySelector("#turn-indicator");
 const titleScreen = document.querySelector("#title-screen");
 const singleplayer = document.querySelector("#singleplayer");
 const multiplayer = document.querySelector("#multiplayer");
+const pregameTitle = document.querySelector("dialog .title");
+const resetD1 = document.querySelector("#reset-d1");
+const switchD1 = document.querySelector("#switch-d1");
+const resetD2 = document.querySelector("#reset-d2");
+const switchD2 = document.querySelector("#switch-d2");
+const resetR = document.querySelector("#reset-r");
+const switchR = document.querySelector("#switch-r");
+const root = document.querySelector(":root");
+const COMPUTER_PAUSE = 2000;
+const PASS_PAUSE = 5000;
+const TEXT_PAUSE = 700;
 let turn = -1; // universal turn tracker to disable/enable attack events
 let mode = -1; // 0: singleplayer mode, 1: multiplayer mode
 
 document.addEventListener("keydown", (e) => {
-  if (e.code === "Escape" && setupDialogue.open) {
+  if (e.code === "Escape" && (setupDialogue.open || titleScreen.open)) {
     e.preventDefault();
   }
 });
 
 singleplayer.addEventListener("click", (e) => {
-  multiplayer.classList = "";
+  multiplayer.classList.remove("selected");
   singleplayer.classList.add("selected");
   mode = 0;
 });
 
 multiplayer.addEventListener("click", (e) => {
-  singleplayer.classList = "";
+  singleplayer.classList.remove("selected");
   multiplayer.classList.add("selected");
   mode = 1;
 });
@@ -35,7 +46,6 @@ multiplayer.addEventListener("click", (e) => {
 function homeRenderBoard(board, gameBoard) {
   let arr = gameBoard.getBackingArray();
   let hitArr = gameBoard.getHitArray();
-  board.classList = "";
   board.innerHTML = "";
   let row;
   for (let i = 0; i < arr.length; i++) {
@@ -68,7 +78,6 @@ function homeRenderBoard(board, gameBoard) {
 function enemyRenderBoard(board, gameBoard) {
   let arr = gameBoard.getBackingArray();
   let hitArr = gameBoard.getHitArray();
-  board.classList = "";
   board.innerHTML = "";
   let row;
   for (let i = 0; i < arr.length; i++) {
@@ -111,6 +120,11 @@ function enemyRenderBoard(board, gameBoard) {
 
 function displaySetup(gameBoard) {
   return new Promise((resolve, reject) => {
+    if (gameBoard == player1) {
+      writeOut("Please choose Player 1's ships", pregameTitle);
+    } else {
+      writeOut("Please choose Player 2's ships", pregameTitle);
+    }
     let pregamePointer = 0;
     setupDialogue.showModal();
     let gridArr = new Array(10);
@@ -140,12 +154,14 @@ function displaySetup(gameBoard) {
       gameBoard.reset();
       pregameRenderBoard();
     });
-    done.addEventListener("click", () => {
-      if (pregamePointer >= pregameStates.length) {
-        setupDialogue.close();
-        resolve();
-      }
-    });
+    setTimeout(() => {
+      done.addEventListener("click", () => {
+        if (pregamePointer >= pregameStates.length) {
+          setupDialogue.close();
+          resolve();
+        }
+      });
+    }, TEXT_PAUSE + 500);
     buttonList.appendChild(rotate);
     buttonList.appendChild(randButt);
     buttonList.appendChild(restart);
@@ -262,52 +278,60 @@ function getWinner(gb1, gb2) {
 
 // moderator/ref (intermediate state)
 function gameChecker() {
+  let prevturn = turn;
+  turn = -1; // intermediate mode
   let winner = getWinner(player1, player2);
   if (winner == player1) {
-    turn = -1;
     displayWinner(player1);
     return;
   } else if (winner == player2) {
-    turn = -1;
     displayWinner(player2);
     return;
   }
   if (mode == 1) {
-    turnIndicator.textContent = `You have 5 seconds to pass the device to the other player`;
+    writeOut(
+      `You have 5 seconds to pass the device to the other player`,
+      turnIndicator
+    );
   }
-  if (turn == 0) {
+  if (prevturn == 0) {
     // if the incoming turn was 0, execute turn 1
-    turn = -1;
     if (mode == 0) {
       setTurnGUI(player2);
-      turn = 1;
-      setTimeout(() => {
-        attackWithComputer(player1);
-        homeRenderBoard(board1, player1);
-      }, 1000); // give the impression that the computer is thinking lol
-    } else if (mode == 1) {
       setTimeout(() => {
         turn = 1;
+        attackWithComputer(player1);
+        homeRenderBoard(board1, player1);
+        return;
+      }, COMPUTER_PAUSE); // give the impression that the computer is thinking lol
+    } else if (mode == 1) {
+      setTimeout(() => {
         setTurnGUI(player2);
         enemyRenderBoard(board1, player1);
         homeRenderBoard(board2, player2);
-      }, 5000);
-      //TODO: write this code lol
+        setTimeout(() => {
+          turn = 1;
+        }, 500);
+      }, PASS_PAUSE);
     }
-  } else if (turn == 1) {
+  } else if (prevturn == 1) {
     // if the incoming turn was 1, execute turn 0
-    turn = -1;
     if (mode == 0) {
-      turn = 0;
       setTurnGUI(player1);
-      enemyRenderBoard(board2, player2);
+      setTimeout(() => {
+        turn = 0;
+        enemyRenderBoard(board2, player2);
+      }, TEXT_PAUSE);
+    } else if (mode == 1) {
+      setTimeout(() => {
+        setTurnGUI(player1);
+        enemyRenderBoard(board2, player2);
+        homeRenderBoard(board1, player1);
+        setTimeout(() => {
+          turn = 0;
+        }, 500);
+      }, PASS_PAUSE);
     }
-    setTimeout(() => {
-      turn = 0;
-      setTurnGUI(player1);
-      enemyRenderBoard(board2, player2);
-      homeRenderBoard(board1, player1);
-    }, 5000);
   }
 }
 
@@ -368,24 +392,53 @@ function attackWithComputer(gb) {
 
 function setTurnGUI(player) {
   if (player == player1) {
-    turnIndicator.textContent = "player 1's turn";
+    writeOut("player 1's turn", turnIndicator);
   } else if (mode == 0) {
-    turnIndicator.textContent = "computer's turn";
+    writeOut("computer's turn", turnIndicator);
   } else {
-    turnIndicator.textContent = "player 2's turn";
+    writeOut("player 2's turn", turnIndicator);
   }
 }
 
 function displayWinner(player) {
   if (player == player1) {
-    turnIndicator.textContent = "player 1 has won!";
+    writeOut("player 1 has won!", turnIndicator);
   } else if (mode == 0) {
-    turnIndicator.textContent = "the computer has won!";
+    writeOut("the computer has won!", turnIndicator);
   } else if (mode == 1) {
-    turnIndicator.textContent = "player 2 has won!";
+    writeOut("player 2 has won!", turnIndicator);
   }
 }
 
+function writeOut(text, element) {
+  element.textContent = "";
+  let i = 0;
+  let speed = 35; /* The speed/duration of the effect in milliseconds */
+  typeWriter();
+
+  function typeWriter() {
+    if (i < text.length) {
+      element.textContent += text.charAt(i);
+      i++;
+      setTimeout(typeWriter, speed);
+    }
+  }
+}
+
+function colorHandler() {
+  let t1 = getComputedStyle(root).getPropertyValue("--primary-color");
+  let t2 = getComputedStyle(root).getPropertyValue("--secondary-color");
+  root.style.setProperty("--primary-color", t2);
+  root.style.setProperty("--secondary-color", t1);
+}
+
+function resetHandler() {
+  player1 = new Gameboard();
+  player2 = new Gameboard();
+  titleScreen.showModal();
+}
+
+// ----------- Nonfunctions start here -----------------
 titleScreen.showModal();
 start.addEventListener("click", () => {
   if (mode != -1) {
@@ -393,6 +446,7 @@ start.addEventListener("click", () => {
     turn = 0;
     if (mode == 0) {
       displaySetup(player1).then(() => {
+        setTurnGUI(player1);
         randomize(player2); // shuffle computer ships
         homeRenderBoard(board1, player1);
         enemyRenderBoard(board2, player2);
@@ -402,6 +456,7 @@ start.addEventListener("click", () => {
         .then(() => displaySetup(player2))
         .then(() => {
           turn = 0;
+          setTurnGUI(player1);
           homeRenderBoard(board1, player1);
           enemyRenderBoard(board2, player2);
         });
@@ -410,8 +465,12 @@ start.addEventListener("click", () => {
 });
 
 let player1 = new Gameboard();
-let player2 = new Gameboard(); // currently computer
+let player2 = new Gameboard();
 
-// randomize(player2);
+resetD1.addEventListener("click", resetHandler);
+resetD2.addEventListener("click", resetHandler);
+resetR.addEventListener("click", resetHandler);
 
-//inGameRenderBoard(board1, player1);
+switchD1.addEventListener("click", colorHandler);
+switchD2.addEventListener("click", colorHandler);
+switchR.addEventListener("click", colorHandler);
