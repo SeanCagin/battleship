@@ -95,7 +95,9 @@ function enemyRenderBoard(board, gameBoard) {
       } else {
         cell.classList.toggle("enemy-cell");
         cell.addEventListener("click", () => {
-          if (turn == 0) {
+          // either player 1's turn in both single player and multiplayer
+          // or player 2's (player1 is the enemy gb) turn in multiplayer only.
+          if (turn == 0 || (mode == 1 && gameBoard == player1 && turn == 1)) {
             gameBoard.receiveAttack([i, j]);
             enemyRenderBoard(board, gameBoard);
             gameChecker();
@@ -251,40 +253,61 @@ function randomize(gameBoard) {
 
 function getWinner(gb1, gb2) {
   if (gb1.allShipsSunk()) {
-    return gb1;
-  } else if (gb2.allShipsSunk()) {
     return gb2;
+  } else if (gb2.allShipsSunk()) {
+    return gb1;
   }
   return -1;
 }
 
+// moderator/ref (intermediate state)
 function gameChecker() {
-  // moderator/ref (intermediate state)
   let winner = getWinner(player1, player2);
   if (winner == player1) {
     turn = -1;
-    displayWinner(player2);
+    displayWinner(player1);
+    return;
   } else if (winner == player2) {
     turn = -1;
-    displayWinner(player1);
+    displayWinner(player2);
+    return;
+  }
+  if (mode == 1) {
+    turnIndicator.textContent = `You have 5 seconds to pass the device to the other player`;
   }
   if (turn == 0) {
     // if the incoming turn was 0, execute turn 1
-    turn = 1;
+    turn = -1;
     if (mode == 0) {
       setTurnGUI(player2);
+      turn = 1;
       setTimeout(() => {
         attackWithComputer(player1);
         homeRenderBoard(board1, player1);
       }, 1000); // give the impression that the computer is thinking lol
     } else if (mode == 1) {
+      setTimeout(() => {
+        turn = 1;
+        setTurnGUI(player2);
+        enemyRenderBoard(board1, player1);
+        homeRenderBoard(board2, player2);
+      }, 5000);
       //TODO: write this code lol
     }
   } else if (turn == 1) {
     // if the incoming turn was 1, execute turn 0
-    turn = 0;
-    setTurnGUI(player1);
-    enemyRenderBoard(board2, player2);
+    turn = -1;
+    if (mode == 0) {
+      turn = 0;
+      setTurnGUI(player1);
+      enemyRenderBoard(board2, player2);
+    }
+    setTimeout(() => {
+      turn = 0;
+      setTurnGUI(player1);
+      enemyRenderBoard(board2, player2);
+      homeRenderBoard(board1, player1);
+    }, 5000);
   }
 }
 
@@ -367,17 +390,28 @@ titleScreen.showModal();
 start.addEventListener("click", () => {
   if (mode != -1) {
     titleScreen.close();
-    displaySetup(player1).then(() => {
-      turn = 0;
-      homeRenderBoard(board1, player1);
-      enemyRenderBoard(board2, player2);
-    });
+    turn = 0;
+    if (mode == 0) {
+      displaySetup(player1).then(() => {
+        randomize(player2); // shuffle computer ships
+        homeRenderBoard(board1, player1);
+        enemyRenderBoard(board2, player2);
+      });
+    } else if (mode == 1) {
+      displaySetup(player1)
+        .then(() => displaySetup(player2))
+        .then(() => {
+          turn = 0;
+          homeRenderBoard(board1, player1);
+          enemyRenderBoard(board2, player2);
+        });
+    }
   }
 });
 
 let player1 = new Gameboard();
 let player2 = new Gameboard(); // currently computer
 
-randomize(player2);
+// randomize(player2);
 
 //inGameRenderBoard(board1, player1);
