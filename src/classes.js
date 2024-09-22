@@ -27,6 +27,10 @@ class Ship {
 class Gameboard {
   #size = 10;
   constructor() {
+    this.init();
+  }
+
+  init() {
     this.backingArray = new Array(this.#size);
     this.hitArray = new Array(this.#size);
     for (let i = 0; i < this.#size; i++) {
@@ -39,19 +43,16 @@ class Gameboard {
     }
   }
 
-  isPlaceable(start, stop) {
-    if (
-      start[0] < 0 ||
-      start[0] >= this.#size ||
-      start[1] < 0 ||
-      start[1] >= this.#size ||
-      stop[0] < 0 ||
-      stop[0] >= this.#size ||
-      stop[1] < 0 ||
-      stop[1] >= this.#size
-    ) {
+  isLegalSquare([c1, c2]) {
+    if (c1 < 0 || c1 >= this.#size || c2 < 0 || c2 >= this.#size) {
       return false;
     }
+    return true;
+  }
+
+  isPlaceable(start, stop) {
+    if (!this.isLegalSquare(start)) return false;
+    if (!this.isLegalSquare(stop)) return false;
     if (this.shipExistsInRange(start, stop)) {
       return false;
     }
@@ -91,7 +92,7 @@ class Gameboard {
   }
 
   receiveAttack(coordinate) {
-    if (this.#isHit(coordinate)) return false;
+    if (this.isHit(coordinate)) return false;
     if (this.shipExists(coordinate)) {
       this.backingArray[coordinate[0]][coordinate[1]].hit();
     }
@@ -99,7 +100,7 @@ class Gameboard {
     return true;
   }
 
-  #isHit(coordinate) {
+  isHit(coordinate) {
     if (this.hitArray[coordinate[0]][coordinate[1]]) {
       return true;
     }
@@ -108,9 +109,9 @@ class Gameboard {
 
   allShipsSunk() {
     for (let i = 0; i < this.backingArray.length; i++) {
-      for (let j = 0; j < this.backingArray.length[0]; j++) {
+      for (let j = 0; j < this.backingArray[0].length; j++) {
         if (
-          typeof this.backingArray[i][j] instanceof Ship &&
+          this.backingArray[i][j] instanceof Ship &&
           !this.backingArray[i][j].isSunk()
         ) {
           return false;
@@ -151,6 +152,10 @@ class Gameboard {
 
   getHitArray() {
     return this.hitArray;
+  }
+
+  reset() {
+    this.init();
   }
 }
 

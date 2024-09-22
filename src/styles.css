@@ -33,8 +33,35 @@ div#page-holder {
   background-color: gray;
 } */
 
-div.cell.black-cell {
+div.cell.full-cell, div.cell.alive {
+  background-color: aquamarine;
+  opacity: 0.9;
+}
+
+div.cell.enemy-cell:hover {
+  background-color: gray;
+  opacity: 0.4;
+}
+
+div.cell.sunk-ship {
   background-color: black;
+  opacity: 0.9;
+}
+
+div.cell.hit {
+  position: relative;
+}
+
+div.cell.hit::after { 
+  content: '';
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 7px;
+  height: 7px;
+  border-radius: 100rem;
+  color: red;
+  background-color: red;
 }
 
 div.hovered {

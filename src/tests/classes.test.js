@@ -36,6 +36,10 @@ describe("gameboard functionality", () => {
 
     expect(gb.allShipsSunk()).toBe(true);
   });
+  test("reset", () => {
+    gb.reset();
+    expect(gb.onlyShipExistsInRange([0, 0], [0, 3])).toBe(false);
+  });
 });
 
 describe("player functionality", () => {});
