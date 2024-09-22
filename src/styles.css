@@ -219,7 +219,7 @@ dialog::backdrop {
 #turn-indicator {
   font-size: 25px;
   font-weight: bolder;
-  margin-top: 80px;
+  margin-top: 40px;
 }
 
 #setup-wrapper {
